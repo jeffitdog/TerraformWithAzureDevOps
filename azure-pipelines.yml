@@ -33,6 +33,15 @@ stages:
         inputs:
           provider: 'azurerm'
           command: 'validate'
+      - task: Prisma Cloud IaC Scan@3
+        inputs:
+          Path: '.'
+          prismaCloudService: 'PrismaCloud-AzureDevOps'
+          High: '1'
+          Medium: '1'
+          Low: '1'
+          Operator: 'or'
+          Tags: 'repo:TerraformWithAzureDevOps'
   - stage: deploy
     jobs:
     - deployment: deploy_terraform
