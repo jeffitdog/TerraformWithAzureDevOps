@@ -44,7 +44,7 @@ stages:
           Low: '1'
           Operator: 'or'
           Tags: 'GitHub Repo: TerraformwithAzureDevOps'
-          IgnoreErrors: true
+
 
   - stage: deploy
     jobs:
