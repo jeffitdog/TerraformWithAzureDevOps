@@ -1,6 +1,6 @@
 resource "azurerm_resource_group" "iac_test" {
-  #name     = "myTestResourceGroup"
-  name     = "ValidName"
+  name     = "Invalid_Name"
+  #name     = "ValidName"
   location = "West Europe"
 
   tags     = {
