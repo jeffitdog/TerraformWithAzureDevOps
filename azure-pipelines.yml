@@ -34,15 +34,17 @@ stages:
         inputs:
           command: 'validate'
           allowTelemetryCollection: true
+
       - task: Prisma Cloud IaC Scan@3
         inputs:
           Path: '.'
-          prismaCloudService: 'PrismaCloud-AzureDevOps'
+          prismaCloudService: 'Prisma-Cloud-IaC'
           High: '1'
           Medium: '1'
           Low: '1'
           Operator: 'or'
-          Tags: 'repo:TerraformWithAzureDevOps'
+          Tags: 'GitHub Repo: TerraformwithAzureDevOps'
+       
   - stage: deploy
     jobs:
     - deployment: deploy_terraform
