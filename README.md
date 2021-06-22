@@ -1,2 +1,1 @@
 ﻿# TerraformWithAzureDevOps
-New line
