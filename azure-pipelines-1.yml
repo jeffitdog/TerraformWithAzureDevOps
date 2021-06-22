@@ -9,11 +9,77 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+stages:
+  - stage: validate
+    jobs:
+    - job: validate
+      continueOnError: false
+      steps:
+      - task: TerraformInstaller@0
+        inputs:
+          terraformVersion: '0.12.3'
+      - task: TerraformCLI@0
+        displayName: Terraform Init
+        inputs:
+          command: 'init'
+          backendType: 'azurerm'
+          backendServiceArm: 'AzureDevOps'
+          backendAzureRmResourceGroupName: 'IaC'
+          backendAzureRmStorageAccountName: 'tfstatefilelocation'
+          backendAzureRmContainerName: 'tfstatefile'
+          backendAzureRmKey: 'terraform.tfstate'
+          allowTelemetryCollection: true
+      - task: TerraformCLI@0
+        displayName: Terraform Validate
+        inputs:
+          command: 'validate'
+          allowTelemetryCollection: true
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+      - task: Prisma Cloud IaC Scan@3
+        inputs:
+          Path: '.'
+          prismaCloudService: 'Prisma-Cloud-IaC-Scanning'
+          High: '1'
+          Medium: '1'
+          Low: '1'
+          Operator: 'or'
+          Tags: 'GitOps'
+
+
+
+  - stage: deploy
+    jobs:
+    - deployment: deploy_terraform
+      continueOnError: false
+      environment: 'dev'
+      strategy:
+       runOnce:
+         deploy:
+            steps:
+              - checkout: self
+              - task: TerraformInstaller@0
+                displayName: 'install'
+                inputs:
+                  terraformVersion: '0.12.3'
+              - task: TerraformCLI@0
+                displayName: Terraform Init
+                inputs:
+                  command: 'init'
+                  backendType: 'azurerm'
+                  backendServiceArm: 'AzureDevOps'
+                  backendAzureRmResourceGroupName: 'IaC'
+                  backendAzureRmStorageAccountName: 'tfstatefilelocation'
+                  backendAzureRmContainerName: 'tfstatefile'
+                  backendAzureRmKey: 'terraform.tfstate'
+                  allowTelemetryCollection: true             
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'plan'
+                  environmentServiceName: 'AzureDevOps'
+                  allowTelemetryCollection: true
+
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'apply'
+                  environmentServiceName: 'AzureDevOps'
+                  allowTelemetryCollection: true
