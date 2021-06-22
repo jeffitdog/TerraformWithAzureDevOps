@@ -38,12 +38,13 @@ stages:
       - task: Prisma Cloud IaC Scan@3
         inputs:
           Path: '.'
-          prismaCloudService: 'prisma-cloud-connection'
+          prismaCloudService: 'Prisma-Cloud-IaC-Scanning'
           High: '1'
           Medium: '1'
           Low: '1'
           Operator: 'or'
-          Tags: 'GitHub Repo: TerraformwithAzureDevOps'
+          Tags: 'GitOps'
+
 
 
   - stage: deploy
